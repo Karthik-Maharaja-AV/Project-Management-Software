@@ -2,15 +2,9 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { auth } from "@/lib/auth";
 import { AuthzError } from "@/lib/authz";
+import { ApiError } from "@/lib/errors";
 
-export class ApiError extends Error {
-  status: number;
-  constructor(message: string, status = 400) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-  }
-}
+export { ApiError };
 
 /** Returns the current session user, or throws a 401 ApiError. */
 export async function requireUser() {

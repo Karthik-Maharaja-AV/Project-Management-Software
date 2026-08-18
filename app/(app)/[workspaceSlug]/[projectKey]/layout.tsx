@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { AuthzError } from "@/lib/authz";
-import { ApiError } from "@/lib/api-utils";
+import { ApiError } from "@/lib/errors";
 import { getProjectByKey } from "@/lib/services/project.service";
 import { ProjectHeader } from "@/components/layout/project-header";
 

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ApiError } from "@/lib/api-utils";
+import { ApiError } from "@/lib/errors";
 import { requireProjectAccess, requireIssueAccess } from "@/lib/authz";
 import { logActivity } from "@/lib/services/activity.service";
 import { createNotification } from "@/lib/services/notification.service";

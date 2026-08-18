@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { ApiError } from "@/lib/api-utils";
+import { ApiError } from "@/lib/errors";
 import { requireIssueAccess } from "@/lib/authz";
 import { logActivity } from "@/lib/services/activity.service";
 import { emitToProject } from "@/lib/socket-server";

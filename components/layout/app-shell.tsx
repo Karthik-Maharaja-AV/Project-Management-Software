@@ -1,8 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Plus, Search, User } from "lucide-react";
+import { LayoutDashboard, Menu, Plus, Search, User, X } from "lucide-react";
 import { WorkspaceSwitcher, type WorkspaceSummary } from "@/components/layout/workspace-switcher";
 import { ProjectNav, type ProjectSummary } from "@/components/layout/project-nav";
 import { UserMenu } from "@/components/layout/user-menu";
@@ -32,14 +33,42 @@ export function AppShell({
   const openCreateProject = useUiStore((s) => s.openCreateProject);
   const closeCreateProject = useUiStore((s) => s.closeCreateProject);
 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setMobileNavOpen(false);
+  }
+
   const isDashboard = pathname === `/${workspace.slug}`;
   const isMyWork = pathname === `/${workspace.slug}/my-work`;
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-surface-0">
-      <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-surface-1">
-        <div className="p-2.5">
-          <WorkspaceSwitcher current={workspace} workspaces={workspaces} />
+      {mobileNavOpen && (
+        <button
+          aria-label="Close navigation"
+          onClick={() => setMobileNavOpen(false)}
+          className="fixed inset-0 z-20 bg-overlay lg:hidden"
+        />
+      )}
+
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-30 flex w-64 shrink-0 -translate-x-full flex-col border-r border-border bg-surface-1 transition-transform duration-200 lg:static lg:translate-x-0",
+          mobileNavOpen && "translate-x-0",
+        )}
+      >
+        <div className="flex items-center gap-1 p-2.5">
+          <div className="min-w-0 flex-1">
+            <WorkspaceSwitcher current={workspace} workspaces={workspaces} />
+          </div>
+          <button
+            onClick={() => setMobileNavOpen(false)}
+            className="flex size-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)] text-text-tertiary hover:bg-surface-2 lg:hidden"
+          >
+            <X className="size-4" />
+          </button>
         </div>
 
         <div className="px-2.5">
@@ -78,6 +107,12 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-12 shrink-0 items-center justify-end gap-1 border-b border-border px-4">
+          <button
+            onClick={() => setMobileNavOpen(true)}
+            className="mr-2 flex size-7 items-center justify-center rounded-[var(--radius-sm)] text-text-secondary hover:bg-surface-2 lg:hidden"
+          >
+            <Menu className="size-4" />
+          </button>
           <button
             onClick={() => openCreateIssue()}
             className="mr-auto flex items-center gap-1.5 rounded-[var(--radius-sm)] bg-accent px-2.5 py-1 text-xs font-medium text-accent-foreground hover:bg-accent-hover transition-colors"

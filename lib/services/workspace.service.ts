@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { ApiError } from "@/lib/api-utils";
+import { ApiError } from "@/lib/errors";
 import { requireWorkspaceRole, workspaceRoleAtLeast, AuthzError } from "@/lib/authz";
 import { slugify } from "@/lib/slug";
 import { logActivity } from "@/lib/services/activity.service";

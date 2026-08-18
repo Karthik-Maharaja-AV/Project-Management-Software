@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { ApiError } from "@/lib/api-utils";
+import { ApiError } from "@/lib/errors";
 import { requireProjectAccess } from "@/lib/authz";
 import type { CreateEpicInput, UpdateEpicInput } from "@/lib/validations/epic";
 

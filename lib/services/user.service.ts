@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { ApiError } from "@/lib/api-utils";
+import { ApiError } from "@/lib/errors";
 import type { RegisterInput, ResetPasswordInput, UpdateProfileInput } from "@/lib/validations/auth";
 
 const SALT_ROUNDS = 12;
