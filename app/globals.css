@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+/* ==========================================================
+   PixelForge design tokens
+   Layered surfaces + an "ember" accent (forge/molten-metal),
+   with dedicated palettes for status/priority/issue-type so
+   brand color never gets confused with semantic meaning.
+   ========================================================== */
+
+:root {
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Light theme surfaces (warm off-white, layered) */
+  --surface-0: #f7f6f4;
+  --surface-1: #ffffff;
+  --surface-2: #f1efec;
+  --surface-3: #ffffff;
+  --surface-raised: #ffffff;
+  --overlay: rgba(23, 20, 16, 0.45);
+
+  --border: rgba(30, 25, 18, 0.1);
+  --border-strong: rgba(30, 25, 18, 0.18);
+
+  --text-primary: #1c1a17;
+  --text-secondary: #5b564e;
+  --text-tertiary: #8a8479;
+  --text-inverse: #fbf9f6;
+
+  --accent: #e2661c;
+  --accent-hover: #c9550f;
+  --accent-foreground: #fff8f1;
+  --accent-muted: #fbe6d3;
+  --accent-muted-foreground: #a34f0e;
+
+  --focus-ring: rgba(226, 102, 28, 0.45);
+
+  --danger: #d1403a;
+  --danger-muted: #fbe2e0;
+  --success: #1f8a5f;
+  --success-muted: #ddf3e7;
+  --warning: #b7791f;
+  --warning-muted: #faedcf;
+  --info: #2563a8;
+  --info-muted: #dcebf9;
+
+  /* Status pipeline */
+  --status-backlog: #8a8479;
+  --status-todo: #6b7fd7;
+  --status-in-progress: #d19a2b;
+  --status-in-review: #9256d9;
+  --status-done: #1f8a5f;
+
+  /* Priority scale */
+  --priority-urgent: #d1403a;
+  --priority-high: #dd7a1f;
+  --priority-medium: #c9a227;
+  --priority-low: #6b7fd7;
+  --priority-none: #a8a296;
+
+  /* Issue types */
+  --type-task: #6b7fd7;
+  --type-bug: #d1403a;
+  --type-feature: #9256d9;
+  --type-improvement: #1f8a9e;
+  --type-epic: #b7791f;
+  --type-story: #1f8a5f;
+
+  --shadow-sm: 0 1px 2px rgba(23, 20, 16, 0.06);
+  --shadow-md: 0 4px 16px rgba(23, 20, 16, 0.08), 0 1px 2px rgba(23, 20, 16, 0.06);
+  --shadow-lg: 0 12px 36px rgba(23, 20, 16, 0.14), 0 2px 6px rgba(23, 20, 16, 0.08);
+}
+
+/* next-themes always resolves "system" to a concrete data-theme value via JS,
+   so a single explicit dark block (no prefers-color-scheme fallback) is enough. */
+:root[data-theme="dark"] {
+  --surface-0: #0c0d10;
+  --surface-1: #131418;
+  --surface-2: #191b21;
+  --surface-3: #20222a;
+  --surface-raised: #1c1e25;
+  --overlay: rgba(4, 4, 6, 0.6);
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --text-primary: #f2f1ee;
+  --text-secondary: #a7a49d;
+  --text-tertiary: #726e66;
+  --text-inverse: #1c1a17;
+
+  --accent: #f0812f;
+  --accent-hover: #ff9c4d;
+  --accent-foreground: #1c0f04;
+  --accent-muted: #3a2513;
+  --accent-muted-foreground: #f3a765;
+
+  --focus-ring: rgba(240, 129, 47, 0.5);
+
+  --danger: #ef6b64;
+  --danger-muted: #3a1a18;
+  --success: #4bc189;
+  --success-muted: #163828;
+  --warning: #e0af4b;
+  --warning-muted: #3a2c10;
+  --info: #6ba6e8;
+  --info-muted: #16283a;
+
+  --status-backlog: #857f76;
+  --status-todo: #8ea0f2;
+  --status-in-progress: #e0af4b;
+  --status-in-review: #b287ea;
+  --status-done: #4bc189;
+
+  --priority-urgent: #ef6b64;
+  --priority-high: #ec9a4e;
+  --priority-medium: #dcc25a;
+  --priority-low: #8ea0f2;
+  --priority-none: #6d685f;
+
+  --type-task: #8ea0f2;
+  --type-bug: #ef6b64;
+  --type-feature: #b287ea;
+  --type-improvement: #4fb8cc;
+  --type-epic: #e0af4b;
+  --type-story: #4bc189;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+@theme inline {
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-raised: var(--surface-raised);
+  --color-overlay: var(--overlay);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-inverse: var(--text-inverse);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-muted-foreground: var(--accent-muted-foreground);
+
+  --color-danger: var(--danger);
+  --color-danger-muted: var(--danger-muted);
+  --color-success: var(--success);
+  --color-success-muted: var(--success-muted);
+  --color-warning: var(--warning);
+  --color-warning-muted: var(--warning-muted);
+  --color-info: var(--info);
+  --color-info-muted: var(--info-muted);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--surface-0);
+  color: var(--text-primary);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+::selection {
+  background: var(--accent-muted);
+  color: var(--accent-muted-foreground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Thin, unobtrusive scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+.animate-skeleton {
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
