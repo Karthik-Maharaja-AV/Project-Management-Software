@@ -33,6 +33,8 @@ export function formatActivity(activity: ActivityDTO): string {
       return "moved this issue back to the backlog";
     case "issue.commented":
       return "commented";
+    case "issue.attachment_added":
+      return `attached ${typeof d.attachment === "string" ? `"${d.attachment}"` : "a file"}`;
     case "issue.archived":
       return "archived this issue";
     case "issue.deleted":

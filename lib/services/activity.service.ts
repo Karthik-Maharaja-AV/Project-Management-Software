@@ -15,6 +15,7 @@ export type ActivityType =
   | "issue.removed_from_sprint"
   | "issue.epic_changed"
   | "issue.commented"
+  | "issue.attachment_added"
   | "issue.archived"
   | "issue.deleted"
   | "project.created"

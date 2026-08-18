@@ -20,6 +20,8 @@ import { EpicPicker } from "@/components/issues/epic-picker";
 import { SprintPicker } from "@/components/issues/sprint-picker";
 import { MarkdownEditor } from "@/components/issues/markdown-editor";
 import { SubtasksList } from "@/components/issues/subtasks-list";
+import { AttachmentsList } from "@/components/issues/attachments-list";
+import { IssueLinks } from "@/components/issues/issue-links";
 import { ActivityFeed } from "@/components/issues/activity-feed";
 import { CommentList } from "@/components/comments/comment-list";
 import { CommentComposer } from "@/components/comments/comment-composer";
@@ -164,6 +166,15 @@ function DrawerBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: 
               Subtasks {issue.subtasks.length > 0 && `(${issue.subtasks.length})`}
             </h3>
             <SubtasksList issue={issue} />
+          </div>
+
+          <div className="mt-6">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">Linked issues</h3>
+            <IssueLinks issueId={issue.id} workspaceSlug={workspaceSlug} />
+          </div>
+
+          <div className="mt-6">
+            <AttachmentsList issueId={issue.id} />
           </div>
 
           <Separator className="my-6" />
