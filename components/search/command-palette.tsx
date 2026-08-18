@@ -87,7 +87,11 @@ export function CommandPalette({
         {keyMatch && (
           <Command.Group heading="Jump to issue" className="px-1 pb-2 text-[11px] font-medium uppercase text-text-tertiary [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5">
             <Command.Item
-              onSelect={() => go(`/${workspaceSlug}/${keyMatch[1].toUpperCase()}?issue=${keyMatch[1].toUpperCase()}-${keyMatch[2]}`)}
+              onSelect={() =>
+                go(
+                  `/${workspaceSlug}/${keyMatch[1].toUpperCase()}/board?issue=${keyMatch[1].toUpperCase()}-${keyMatch[2]}`,
+                )
+              }
               className="flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] px-2 py-2 text-sm text-text-primary data-[selected=true]:bg-surface-2"
             >
               <Bug className="size-3.5 text-text-tertiary" />

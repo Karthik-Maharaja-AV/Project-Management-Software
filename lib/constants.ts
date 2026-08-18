@@ -88,3 +88,7 @@ export const LABEL_COLORS = [
 export function findMeta<T extends { value: string }>(list: T[], value: string) {
   return list.find((item) => item.value === value) ?? list[list.length - 1];
 }
+
+export function randomLabelColor() {
+  return LABEL_COLORS[Math.floor(Math.random() * LABEL_COLORS.length)];
+}

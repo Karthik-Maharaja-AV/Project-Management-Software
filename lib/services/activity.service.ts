@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { emitToProject, emitToWorkspace } from "@/lib/socket-server";
+import { requireIssueAccess, requireWorkspaceRole } from "@/lib/authz";
 
 export type ActivityType =
   | "issue.created"
@@ -49,4 +50,27 @@ export async function logActivity(params: {
   emitToWorkspace(params.workspaceId, "activity:created", activity);
 
   return activity;
+}
+
+export async function listIssueActivity(userId: string, issueId: string) {
+  await requireIssueAccess(userId, issueId, "GUEST");
+  return prisma.activity.findMany({
+    where: { issueId },
+    include: { actor: { select: { id: true, name: true, username: true, avatarUrl: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
+export async function listWorkspaceActivity(userId: string, workspaceId: string, limit = 20) {
+  await requireWorkspaceRole(userId, workspaceId, "GUEST");
+  return prisma.activity.findMany({
+    where: { workspaceId },
+    include: {
+      actor: { select: { id: true, name: true, username: true, avatarUrl: true } },
+      issue: { select: { id: true, number: true, title: true, project: { select: { key: true } } } },
+      project: { select: { id: true, name: true, key: true } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
 }
