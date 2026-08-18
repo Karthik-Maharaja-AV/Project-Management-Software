@@ -91,12 +91,13 @@ export async function startSprint(userId: string, sprintId: string) {
 
   await logActivity({ workspaceId: project.workspaceId, projectId: project.id, actorId: userId, type: "sprint.started", data: { sprintId, name: sprint.name } });
 
+  const workspace = await prisma.workspace.findUniqueOrThrow({ where: { id: project.workspaceId } });
   const members = await prisma.projectMember.findMany({ where: { projectId: sprint.projectId } });
   await createNotifications(members.map((m) => m.userId), {
     actorId: userId,
     type: "SPRINT_STARTED",
     title: `${sprint.name} has started`,
-    link: `/sprints/${sprintId}`,
+    link: `/${workspace.slug}/${project.key}/sprints/${sprintId}`,
   });
 
   return updated;
@@ -122,12 +123,13 @@ export async function completeSprint(userId: string, sprintId: string, moveIncom
 
   await logActivity({ workspaceId: project.workspaceId, projectId: project.id, actorId: userId, type: "sprint.completed", data: { sprintId, name: sprint.name } });
 
+  const workspace = await prisma.workspace.findUniqueOrThrow({ where: { id: project.workspaceId } });
   const members = await prisma.projectMember.findMany({ where: { projectId: sprint.projectId } });
   await createNotifications(members.map((m) => m.userId), {
     actorId: userId,
     type: "SPRINT_ENDED",
     title: `${sprint.name} has completed`,
-    link: `/sprints/${sprintId}`,
+    link: `/${workspace.slug}/${project.key}/sprints/${sprintId}`,
   });
 
   return updated;

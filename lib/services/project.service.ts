@@ -112,12 +112,13 @@ export async function addProjectMember(userId: string, projectId: string, input:
     data: { targetUserId: input.userId },
   });
 
+  const workspace = await prisma.workspace.findUniqueOrThrow({ where: { id: project.workspaceId } });
   await createNotification({
     userId: input.userId,
     actorId: userId,
     type: "ADDED_TO_PROJECT",
     title: `You were added to ${project.name}`,
-    link: `/projects/${project.id}`,
+    link: `/${workspace.slug}/${project.key}/board`,
   });
 
   return member;
