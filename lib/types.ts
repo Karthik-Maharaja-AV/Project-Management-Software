@@ -68,6 +68,16 @@ export type CommentDTO = {
   createdAt: string;
 };
 
+export type ProjectCardData = {
+  id: string;
+  name: string;
+  key: string;
+  description: string | null;
+  icon: string | null;
+  color: string;
+  _count: { issues: number; members: number };
+};
+
 export type ActivityDTO = {
   id: string;
   workspaceId: string;

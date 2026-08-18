@@ -89,7 +89,7 @@ export function AppShell({
         <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
       </div>
 
-      <CommandPalette workspaceSlug={workspace.slug} projects={projects} />
+      <CommandPalette workspaceId={workspace.id} workspaceSlug={workspace.slug} projects={projects} />
       <CreateIssueModal projects={projects} />
       <IssueDetailDrawer workspaceSlug={workspace.slug} />
       <CreateProjectDialog

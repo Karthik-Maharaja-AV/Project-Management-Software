@@ -154,6 +154,12 @@ export async function getIssueByHumanKey(userId: string, workspaceSlug: string, 
   });
   if (!issue) throw new ApiError("Issue not found", 404);
 
+  await prisma.recentlyViewed.upsert({
+    where: { userId_issueId: { userId, issueId: issue.id } },
+    create: { userId, issueId: issue.id },
+    update: { viewedAt: new Date() },
+  });
+
   return serializeIssue(issue);
 }
 
