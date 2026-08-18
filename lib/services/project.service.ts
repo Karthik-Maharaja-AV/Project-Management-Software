@@ -48,12 +48,12 @@ export async function listProjects(userId: string, workspaceId: string) {
 }
 
 export async function getProjectByKey(userId: string, workspaceSlug: string, projectKey: string) {
-  const { workspace } = await requireWorkspaceBySlug(userId, workspaceSlug, "GUEST");
+  const { workspace, member } = await requireWorkspaceBySlug(userId, workspaceSlug, "GUEST");
   const project = await prisma.project.findUnique({
     where: { workspaceId_key: { workspaceId: workspace.id, key: projectKey.toUpperCase() } },
   });
   if (!project) throw new ApiError("Project not found", 404);
-  return { workspace, project };
+  return { workspace, project, workspaceRole: member.role };
 }
 
 export async function updateProject(userId: string, projectId: string, input: UpdateProjectInput) {

@@ -25,7 +25,7 @@ export const ISSUE_STATUSES: { value: IssueStatus; label: string; color: string 
   { value: "DONE", label: "Done", color: "var(--status-done)" },
 ];
 
-export const BOARD_STATUSES: IssueStatus[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
+export const BOARD_STATUSES: IssueStatus[] = ["BACKLOG", "TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
 
 export const STATUS_ICON: Record<IssueStatus, typeof Circle> = {
   BACKLOG: Circle,

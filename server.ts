@@ -1,5 +1,4 @@
 import { createServer } from "node:http";
-import { parse } from "node:url";
 import next from "next";
 import { Server as SocketIOServer } from "socket.io";
 import { getToken } from "next-auth/jwt";
@@ -12,8 +11,7 @@ const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
   const httpServer = createServer((req, res) => {
-    const parsedUrl = parse(req.url ?? "/", true);
-    handle(req, res, parsedUrl);
+    handle(req, res);
   });
 
   const io = new SocketIOServer(httpServer, {
