@@ -17,6 +17,7 @@ export type WorkspaceInvitationDTO = {
   role: WorkspaceRole;
   status: string;
   createdAt: string;
+  token: string;
 };
 
 export function useWorkspaceMembers(workspaceId: string) {
