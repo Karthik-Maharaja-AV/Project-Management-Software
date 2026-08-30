@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
-const AUTH_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"];
+// Redirected away from when already logged in — showing a login/register form to
+// someone who's already signed in serves no purpose.
+const LOGGED_OUT_ONLY_PAGES = ["/login", "/register"];
+// Always reachable regardless of session state. A password-reset link must work even
+// if the browser happens to have an unrelated active session — e.g. resetting on a
+// shared/borrowed device, or after suspecting the account was compromised.
+const ALWAYS_ACCESSIBLE_AUTH_PAGES = ["/forgot-password", "/reset-password"];
 const PUBLIC_PREFIXES = [
   "/api/auth",
   "/api/register",
@@ -20,9 +26,12 @@ export const proxy = auth((req) => {
   }
 
   const isApiRoute = pathname.startsWith("/api/");
-  const isAuthPage = AUTH_PAGES.some((p) => pathname.startsWith(p));
 
-  if (isAuthPage) {
+  if (ALWAYS_ACCESSIBLE_AUTH_PAGES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
+  if (LOGGED_OUT_ONLY_PAGES.some((p) => pathname.startsWith(p))) {
     if (isLoggedIn) {
       return NextResponse.redirect(new URL("/", nextUrl));
     }
