@@ -5,6 +5,7 @@ import { requireWorkspaceRole, workspaceRoleAtLeast, AuthzError } from "@/lib/au
 import { slugify } from "@/lib/slug";
 import { logActivity } from "@/lib/services/activity.service";
 import { createNotification } from "@/lib/services/notification.service";
+import { sendInvitationEmail } from "@/lib/email";
 import type { CreateWorkspaceInput, InviteMemberInput, UpdateWorkspaceInput } from "@/lib/validations/workspace";
 import type { WorkspaceRole } from "@prisma/client";
 
@@ -107,7 +108,10 @@ export async function listInvitations(userId: string, workspaceId: string) {
 export async function inviteMember(userId: string, workspaceId: string, input: InviteMemberInput) {
   await requireWorkspaceRole(userId, workspaceId, "ADMIN");
 
-  const workspace = await prisma.workspace.findUniqueOrThrow({ where: { id: workspaceId } });
+  const [workspace, inviter] = await Promise.all([
+    prisma.workspace.findUniqueOrThrow({ where: { id: workspaceId } }),
+    prisma.user.findUniqueOrThrow({ where: { id: userId } }),
+  ]);
 
   const existingUser = await prisma.user.findUnique({ where: { email: input.email } });
   if (existingUser) {
@@ -143,6 +147,14 @@ export async function inviteMember(userId: string, workspaceId: string, input: I
       link: `/invite/${token}`,
     });
   }
+
+  const inviteUrl = `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/invite/${token}`;
+  await sendInvitationEmail({
+    to: input.email,
+    inviterName: inviter.name,
+    workspaceName: workspace.name,
+    inviteUrl,
+  });
 
   return invitation;
 }
