@@ -1,7 +1,22 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "PixelForge <onboarding@resend.dev>";
+function createTransport() {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT) || 587;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) return null;
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+  });
+}
+
+const FROM_EMAIL = process.env.SMTP_FROM || process.env.SMTP_USER || "PixelForge <noreply@localhost>";
 
 /** Escapes a string for safe interpolation into an HTML email body — user-controlled
  * values (display names, workspace names) flow into these templates unvalidated for
@@ -16,22 +31,27 @@ function escapeHtml(value: string) {
 }
 
 /**
- * Sends an email via Resend if RESEND_API_KEY is configured; otherwise logs the
- * content to the console. This keeps the app fully functional (readable by whoever
- * runs the server) even before an email provider is wired up.
+ * Sends an email via SMTP if SMTP_HOST/SMTP_USER/SMTP_PASS are configured; otherwise
+ * logs the content to the console. This keeps the app fully functional (readable by
+ * whoever runs the server) even before an email provider is wired up. Never uses
+ * nodemailer's `raw` option or file/URL-based attachments — both are user-input-free
+ * here by design, since those are the vectors for nodemailer's known SSRF/file-read
+ * advisories on messages built from untrusted input.
  */
 export async function sendEmail(params: { to: string; subject: string; html: string; text: string }) {
-  if (!resend) {
-    console.log(`\n[email] RESEND_API_KEY not set — logging instead of sending:\n  to: ${params.to}\n  subject: ${params.subject}\n  ${params.text}\n`);
+  const transport = createTransport();
+  if (!transport) {
+    console.log(`\n[email] SMTP not configured — logging instead of sending:\n  to: ${params.to}\n  subject: ${params.subject}\n  ${params.text}\n`);
     return { sent: false as const };
   }
 
   try {
-    await resend.emails.send({
+    await transport.sendMail({
       from: FROM_EMAIL,
       to: params.to,
       subject: params.subject,
       html: params.html,
+      text: params.text,
     });
     return { sent: true as const };
   } catch (err) {

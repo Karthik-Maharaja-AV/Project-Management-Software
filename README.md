@@ -104,17 +104,18 @@ incomplete issues rolling back to the backlog), and search (by issue key and tex
 | `AUTH_SECRET` | Yes | `npx auth secret` to generate one |
 | `NEXTAUTH_URL` | Yes | Base URL of the app (`http://localhost:3000` locally) |
 | `PORT` | No | Defaults to 3000 |
-| `RESEND_API_KEY` | No | Enables real email (password reset, workspace invitations) via [Resend](https://resend.com). Without it, both are logged to the server console instead. |
-| `RESEND_FROM_EMAIL` | No | Defaults to `PixelForge <onboarding@resend.dev>` (Resend's sandbox sender — can only deliver to your own Resend account email until you verify a real domain in Resend's dashboard) |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | No | Enables real email (password reset, workspace invitations) via any SMTP relay (`lib/email.ts`). Without these, both are logged to the server console instead. For Gmail: `smtp.gmail.com`, port `465`, and an **App Password** (not your real password) — see below. |
+| `SMTP_FROM` | No | Defaults to `SMTP_USER`. The From address on outgoing mail. |
 
 ## Known limitations
 
-- **Email works, but the sandbox sender is limited.** With `RESEND_API_KEY` set, password
-  resets and workspace invitations really are emailed (`lib/email.ts`). Without a verified
-  domain in Resend, though, the default `onboarding@resend.dev` sender can typically only
-  deliver to the email on the Resend account itself — not arbitrary friends' inboxes. Verify
-  a domain you own in Resend (Domains → Add Domain) to send to anyone. Without
-  `RESEND_API_KEY` set at all, both flows fall back to logging the link/content to the
+- **Email works via SMTP, tested with Gmail.** With `SMTP_HOST`/`SMTP_USER`/`SMTP_PASS` set,
+  password resets and workspace invitations really are emailed (`lib/email.ts`). Unlike a
+  provider API with an unverified sandbox sender, authenticating as a real Gmail account lets
+  you send to anyone, not just yourself — no domain verification needed. Requires enabling
+  2-Step Verification on the Google account and generating an App Password (Google Account →
+  Security → 2-Step Verification → App Passwords); free tier is capped around 500 emails/day.
+  Without SMTP configured at all, both flows fall back to logging the link/content to the
   server console, so the app stays fully usable either way.
 - **File attachments live on local disk** (`/uploads`, gitignored). Fine for self-hosting
   this for a friend group; swap for S3-compatible storage before deploying anywhere
