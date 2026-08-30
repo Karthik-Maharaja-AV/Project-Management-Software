@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { MoreHorizontal, Send, X } from "lucide-react";
+import { Copy, MoreHorizontal, Send, X } from "lucide-react";
 import type { WorkspaceRole } from "@prisma/client";
 import { inviteMemberSchema, type InviteMemberInput } from "@/lib/validations/workspace";
 import {
@@ -70,6 +70,16 @@ export function MembersSettings({
     }
   };
 
+  async function copyInviteLink(token: string) {
+    const url = `${window.location.origin}/invite/${token}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Invite link copied — share it however you like");
+    } catch {
+      toast.error("Couldn't copy automatically — link: " + url);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-5">
       {isAdmin && (
@@ -77,7 +87,9 @@ export function MembersSettings({
           <CardHeader className="flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle>Invite a friend</CardTitle>
-              <CardDescription>They&apos;ll get an in-app invitation to accept.</CardDescription>
+              <CardDescription>
+                They&apos;ll get an email if one&apos;s configured — or copy the link below to share it yourself.
+              </CardDescription>
             </div>
             {!inviteOpen && <Button onClick={() => setInviteOpen(true)}>Invite</Button>}
           </CardHeader>
@@ -184,6 +196,9 @@ export function MembersSettings({
                     <p className="truncate text-sm text-text-primary">{inv.email}</p>
                   </div>
                   <Badge>{inv.role.toLowerCase()}</Badge>
+                  <Button variant="ghost" size="sm" onClick={() => copyInviteLink(inv.token)}>
+                    <Copy className="size-3.5" /> Copy link
+                  </Button>
                   <Button variant="ghost" size="sm" onClick={() => revokeInvite.mutate(inv.id)}>
                     Revoke
                   </Button>
