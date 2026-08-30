@@ -3,6 +3,18 @@ import { Resend } from "resend";
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "PixelForge <onboarding@resend.dev>";
 
+/** Escapes a string for safe interpolation into an HTML email body — user-controlled
+ * values (display names, workspace names) flow into these templates unvalidated for
+ * HTML safety, so this prevents them from injecting markup/links into outgoing mail. */
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
  * Sends an email via Resend if RESEND_API_KEY is configured; otherwise logs the
  * content to the console. This keeps the app fully functional (readable by whoever
@@ -38,6 +50,7 @@ function emailShell(bodyHtml: string) {
 }
 
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
+  const safeUrl = escapeHtml(resetUrl);
   return sendEmail({
     to,
     subject: "Reset your PixelForge password",
@@ -45,7 +58,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
     html: emailShell(`
       <p>Someone requested a password reset for this account. If that was you, click below:</p>
       <p style="margin: 24px 0;">
-        <a href="${resetUrl}" style="background:#e2661c;color:#fff8f1;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Reset password</a>
+        <a href="${safeUrl}" style="background:#e2661c;color:#fff8f1;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Reset password</a>
       </p>
       <p style="color:#5b564e;font-size:13px;">This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>
     `),
@@ -58,14 +71,18 @@ export async function sendInvitationEmail(params: {
   workspaceName: string;
   inviteUrl: string;
 }) {
+  // subject/text are plain strings (no HTML rendering), so only the HTML body needs escaping
+  const safeInviterName = escapeHtml(params.inviterName);
+  const safeWorkspaceName = escapeHtml(params.workspaceName);
+  const safeUrl = escapeHtml(params.inviteUrl);
   return sendEmail({
     to: params.to,
     subject: `${params.inviterName} invited you to ${params.workspaceName} on PixelForge`,
     text: `${params.inviterName} invited you to join ${params.workspaceName} on PixelForge: ${params.inviteUrl}`,
     html: emailShell(`
-      <p><strong>${params.inviterName}</strong> invited you to join <strong>${params.workspaceName}</strong> on PixelForge.</p>
+      <p><strong>${safeInviterName}</strong> invited you to join <strong>${safeWorkspaceName}</strong> on PixelForge.</p>
       <p style="margin: 24px 0;">
-        <a href="${params.inviteUrl}" style="background:#e2661c;color:#fff8f1;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Accept invitation</a>
+        <a href="${safeUrl}" style="background:#e2661c;color:#fff8f1;padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Accept invitation</a>
       </p>
       <p style="color:#5b564e;font-size:13px;">If you don't have a PixelForge account yet, you'll be asked to create one first.</p>
     `),
