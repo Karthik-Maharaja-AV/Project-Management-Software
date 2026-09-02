@@ -1,7 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEpic } from "@/hooks/use-epics";
 import { useUiStore } from "@/lib/stores/ui-store";
+import { issueHref } from "@/lib/issue-links";
 import { STATUS_ICON, findMeta, ISSUE_STATUSES } from "@/lib/constants";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,9 +23,8 @@ type EpicIssue = {
   labels: { id: string; name: string; color: string }[];
 };
 
-export function EpicDetail({ epicId }: { epicId: string }) {
+export function EpicDetail({ epicId, workspaceSlug }: { epicId: string; workspaceSlug: string }) {
   const { data: epic, isLoading } = useEpic(epicId);
-  const openIssue = useUiStore((s) => s.openIssue);
   const openCreateIssue = useUiStore((s) => s.openCreateIssue);
 
   if (isLoading || !epic) {
@@ -68,9 +69,9 @@ export function EpicDetail({ epicId }: { epicId: string }) {
             const StatusIcon = STATUS_ICON[issue.status];
             const meta = findMeta(ISSUE_STATUSES, issue.status);
             return (
-              <button
+              <Link
                 key={issue.id}
-                onClick={() => openIssue(`${epic.project.key}-${issue.number}`)}
+                href={issueHref(workspaceSlug, `${epic.project.key}-${issue.number}`)}
                 className="flex w-full items-center gap-2.5 border-b border-border px-3 py-2 text-left last:border-b-0 hover:bg-surface-2"
               >
                 <StatusIcon className="size-3.5 shrink-0" style={{ color: meta.color }} />
@@ -84,7 +85,7 @@ export function EpicDetail({ epicId }: { epicId: string }) {
                   </span>
                 )}
                 {issue.assignee && <Avatar name={issue.assignee.name} src={issue.assignee.avatarUrl} size="xs" />}
-              </button>
+              </Link>
             );
           })
         )}

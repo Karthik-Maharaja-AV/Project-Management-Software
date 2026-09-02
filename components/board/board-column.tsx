@@ -16,10 +16,12 @@ export function BoardColumn({
   status,
   issues,
   projectId,
+  workspaceSlug,
 }: {
   status: IssueStatus;
   issues: IssueDTO[];
   projectId: string;
+  workspaceSlug: string;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: `column:${status}` });
   const meta = findMeta(ISSUE_STATUSES, status);
@@ -71,7 +73,7 @@ export function BoardColumn({
         )}
         <SortableContext items={issues.map((i) => i.id)} strategy={verticalListSortingStrategy}>
           {issues.map((issue) => (
-            <DraggableIssueCard key={issue.id} issue={issue} />
+            <DraggableIssueCard key={issue.id} issue={issue} workspaceSlug={workspaceSlug} />
           ))}
         </SortableContext>
         {issues.length === 0 && !adding && (

@@ -32,7 +32,7 @@ export async function createComment(userId: string, issueId: string, body: strin
 
   const key = `${project.key}-${issue.number}`;
   const workspace = await prisma.workspace.findUniqueOrThrow({ where: { id: project.workspaceId } });
-  const link = issueUrl(workspace.slug, project.key, key);
+  const link = issueUrl(workspace.slug, key);
 
   await logActivity({
     workspaceId: project.workspaceId,

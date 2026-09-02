@@ -33,6 +33,7 @@ export type IssueDTO = {
   projectId: string;
   title: string;
   description: string | null;
+  acceptanceCriteria: string | null;
   type: IssueType;
   status: IssueStatus;
   priority: IssuePriority;

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Link2, Plus, X } from "lucide-react";
 import { useCreateIssueLink, useDeleteIssueLink, useIssueLinks } from "@/hooks/use-issue-links";
-import { useUiStore } from "@/lib/stores/ui-store";
+import { issueHref } from "@/lib/issue-links";
 import { STATUS_ICON, findMeta, ISSUE_STATUSES } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,7 +36,6 @@ export function IssueLinks({ issueId, workspaceSlug }: { issueId: string; worksp
   const { data: links } = useIssueLinks(issueId);
   const createLink = useCreateIssueLink(issueId);
   const deleteLink = useDeleteIssueLink(issueId);
-  const openIssue = useUiStore((s) => s.openIssue);
 
   const [adding, setAdding] = useState(false);
   const [linkType, setLinkType] = useState("BLOCKS");
@@ -78,11 +78,11 @@ export function IssueLinks({ issueId, workspaceSlug }: { issueId: string; worksp
         return (
           <div key={link.id} className="flex items-center gap-2 rounded-[var(--radius-sm)] border border-border px-2 py-1.5 text-[13px]">
             <span className="w-24 shrink-0 text-[11px] text-text-tertiary">{LINK_LABELS[link.type] ?? link.type}</span>
-            <button onClick={() => openIssue(link.issue.key)} className="flex min-w-0 flex-1 items-center gap-1.5 text-left">
+            <Link href={issueHref(workspaceSlug, link.issue.key)} className="flex min-w-0 flex-1 items-center gap-1.5 text-left">
               <StatusIcon className="size-3.5 shrink-0" style={{ color: meta.color }} />
               <span className="font-mono text-[11px] text-text-tertiary">{link.issue.key}</span>
               <span className="truncate text-text-primary">{link.issue.title}</span>
-            </button>
+            </Link>
             <button onClick={() => deleteLink.mutate(link.id)} className="text-text-tertiary hover:text-danger">
               <X className="size-3.5" />
             </button>

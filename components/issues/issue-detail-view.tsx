@@ -1,16 +1,16 @@
 "use client";
 
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
-import { Archive, Copy, MoreHorizontal, Trash2, X } from "lucide-react";
-import { useUiStore } from "@/lib/stores/ui-store";
+import { ArrowLeft, Archive, Copy, MoreHorizontal, Trash2 } from "lucide-react";
 import { useIssueByKey } from "@/hooks/use-issue";
 import { useDeleteIssue, useUpdateIssue } from "@/hooks/use-issues";
 import { useSocketRoom } from "@/components/providers/socket-provider";
-import { useIssueDrawerSync } from "@/hooks/use-issue-drawer-sync";
+import { issueHref } from "@/lib/issue-links";
 import { TypeSelect } from "@/components/issues/type-select";
 import { StatusSelect } from "@/components/issues/status-select";
 import { PrioritySelect } from "@/components/issues/priority-select";
@@ -38,45 +38,34 @@ import {
 import type { IssueDTO } from "@/lib/types";
 import type { IssueStatus, IssuePriority, IssueType } from "@prisma/client";
 
-export function IssueDetailDrawer({ workspaceSlug }: { workspaceSlug: string }) {
-  useIssueDrawerSync();
-  const activeIssueKey = useUiStore((s) => s.activeIssueKey);
-  const closeIssue = useUiStore((s) => s.closeIssue);
-  const { data: issue, isLoading } = useIssueByKey(workspaceSlug, activeIssueKey);
+export function IssueDetailView({ workspaceSlug, issueKey }: { workspaceSlug: string; issueKey: string }) {
+  const { data: issue, isLoading } = useIssueByKey(workspaceSlug, issueKey);
   useSocketRoom("project", issue?.projectId);
 
-  return (
-    <DialogPrimitive.Root open={!!activeIssueKey} onOpenChange={(o) => !o && closeIssue()}>
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-40 bg-overlay data-[state=open]:animate-fade-in" />
-        <DialogPrimitive.Content className="fixed right-0 top-0 z-40 flex h-full w-full max-w-3xl flex-col border-l border-border-strong bg-surface-1 shadow-[var(--shadow-lg)] focus:outline-none">
-          <DialogPrimitive.Title className="sr-only">Issue details</DialogPrimitive.Title>
-          {isLoading || !issue ? <DrawerSkeleton /> : <DrawerBody key={issue.id} issue={issue} workspaceSlug={workspaceSlug} />}
-        </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
-  );
+  if (isLoading || !issue) {
+    return (
+      <div className="flex flex-col gap-4 p-6">
+        <Skeleton className="h-5 w-24" />
+        <Skeleton className="h-8 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    );
+  }
+
+  return <IssueDetailBody key={issue.id} issue={issue} workspaceSlug={workspaceSlug} />;
 }
 
-function DrawerSkeleton() {
-  return (
-    <div className="flex flex-col gap-4 p-6">
-      <Skeleton className="h-5 w-24" />
-      <Skeleton className="h-8 w-full" />
-      <Skeleton className="h-24 w-full" />
-    </div>
-  );
-}
-
-function DrawerBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: string }) {
-  const closeIssue = useUiStore((s) => s.closeIssue);
-  const openIssue = useUiStore((s) => s.openIssue);
+function IssueDetailBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: string }) {
+  const router = useRouter();
   const updateIssueMutation = useUpdateIssue(issue.projectId);
   const deleteIssueMutation = useDeleteIssue(issue.projectId);
   const queryClient = useQueryClient();
 
   const [title, setTitle] = useState(issue.title);
   const [description, setDescription] = useState(issue.description ?? "");
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState(issue.acceptanceCriteria ?? "");
+
+  const boardHref = `/${workspaceSlug}/${issue.project.key}/board`;
 
   async function patch(input: Parameters<typeof updateIssueMutation.mutateAsync>[0]["input"]) {
     try {
@@ -93,13 +82,13 @@ function DrawerBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: 
     if (!confirm(`Delete ${issue.key}? This can't be undone.`)) return;
     await deleteIssueMutation.mutateAsync(issue.id);
     toast.success(`${issue.key} deleted`);
-    closeIssue();
+    router.push(boardHref);
   }
 
   async function handleArchive() {
     await fetch(`/api/issues/${issue.id}/archive`, { method: "POST" });
     toast.success(`${issue.key} archived`);
-    closeIssue();
+    router.push(boardHref);
   }
 
   function handleDuplicate() {
@@ -107,8 +96,15 @@ function DrawerBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: 
   }
 
   return (
-    <>
-      <div className="flex h-12 shrink-0 items-center gap-2 border-b border-border px-4">
+    <div className="flex flex-col">
+      <div className="flex h-12 shrink-0 items-center gap-2 border-b border-border px-6">
+        <Link
+          href={boardHref}
+          className="flex items-center gap-1.5 rounded-[var(--radius-sm)] px-1.5 py-1 text-sm text-text-secondary hover:bg-surface-2 hover:text-text-primary"
+        >
+          <ArrowLeft className="size-3.5" /> Board
+        </Link>
+        <span className="text-text-tertiary">/</span>
         <TypeSelect value={issue.type} onChange={(v: IssueType) => patch({ type: v })} compact />
         <span className="font-mono text-xs text-text-tertiary">{issue.key}</span>
         <div className="ml-auto flex items-center gap-1">
@@ -128,44 +124,60 @@ function DrawerBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: 
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <DialogPrimitive.Close className="flex size-7 items-center justify-center rounded-[var(--radius-sm)] text-text-tertiary hover:bg-surface-2">
-            <X className="size-4" />
-          </DialogPrimitive.Close>
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1">
-        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto p-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-1 gap-8 p-6">
+        <div className="min-w-0 flex-1">
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onBlur={() => title.trim() && title !== issue.title && patch({ title: title.trim() })}
-            className="mb-4 border-none bg-transparent text-xl font-semibold text-text-primary outline-none"
+            className="mb-4 w-full border-none bg-transparent text-2xl font-semibold text-text-primary outline-none"
           />
 
           {issue.parent && (
-            <button
-              onClick={() => openIssue(`${issue.project.key}-${issue.parent!.number}`)}
+            <Link
+              href={issueHref(workspaceSlug, `${issue.project.key}-${issue.parent.number}`)}
               className="mb-3 flex w-fit items-center gap-1.5 rounded-[var(--radius-sm)] bg-surface-2 px-2 py-1 text-xs text-text-secondary hover:text-text-primary"
             >
               Subtask of {issue.project.key}-{issue.parent.number} {issue.parent.title}
-            </button>
+            </Link>
           )}
 
-          <MarkdownEditor
-            projectId={issue.projectId}
-            value={description}
-            onChange={setDescription}
-            onBlur={() => description !== (issue.description ?? "") && patch({ description })}
-            placeholder="Add a description…"
-            minRows={5}
-          />
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">Description</h3>
+            <MarkdownEditor
+              projectId={issue.projectId}
+              value={description}
+              onChange={setDescription}
+              onBlur={() => description !== (issue.description ?? "") && patch({ description })}
+              placeholder="Add a description…"
+              minRows={5}
+            />
+          </div>
+
+          <div className="mt-6">
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
+              Acceptance Criteria
+            </h3>
+            <MarkdownEditor
+              projectId={issue.projectId}
+              value={acceptanceCriteria}
+              onChange={setAcceptanceCriteria}
+              onBlur={() =>
+                acceptanceCriteria !== (issue.acceptanceCriteria ?? "") && patch({ acceptanceCriteria })
+              }
+              placeholder="What needs to be true for this issue to be considered done?"
+              minRows={4}
+            />
+          </div>
 
           <div className="mt-6">
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               Subtasks {issue.subtasks.length > 0 && `(${issue.subtasks.length})`}
             </h3>
-            <SubtasksList issue={issue} />
+            <SubtasksList issue={issue} workspaceSlug={workspaceSlug} />
           </div>
 
           <div className="mt-6">
@@ -197,7 +209,7 @@ function DrawerBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: 
           </div>
         </div>
 
-        <div className="w-64 shrink-0 overflow-y-auto border-l border-border p-4">
+        <div className="w-64 shrink-0">
           <div className="flex flex-col gap-4">
             <SidebarField label="Status">
               <StatusSelect value={issue.status} onChange={(v: IssueStatus) => patch({ status: v })} />
@@ -268,7 +280,7 @@ function DrawerBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: 
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -280,4 +292,3 @@ function SidebarField({ label, children }: { label: string; children: React.Reac
     </div>
   );
 }
-

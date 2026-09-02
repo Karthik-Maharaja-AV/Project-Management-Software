@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { IssueCard } from "@/components/issues/issue-card";
 import type { IssueDTO } from "@/lib/types";
 
-export function DraggableIssueCard({ issue }: { issue: IssueDTO }) {
+export function DraggableIssueCard({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: string }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: issue.id,
   });
@@ -18,7 +18,7 @@ export function DraggableIssueCard({ issue }: { issue: IssueDTO }) {
       {...listeners}
       className={isDragging ? "opacity-40" : undefined}
     >
-      <IssueCard issue={issue} />
+      <IssueCard issue={issue} workspaceSlug={workspaceSlug} />
     </div>
   );
 }

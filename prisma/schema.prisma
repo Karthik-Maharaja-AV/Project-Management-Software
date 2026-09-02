@@ -252,6 +252,7 @@ model Issue {
   number      Int
   title       String
   description String?
+  acceptanceCriteria String?
   type        IssueType     @default(TASK)
   status      IssueStatus   @default(BACKLOG)
   priority    IssuePriority @default(NO_PRIORITY)

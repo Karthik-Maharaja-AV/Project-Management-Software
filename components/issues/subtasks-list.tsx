@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Plus } from "lucide-react";
 import { STATUS_ICON, findMeta, ISSUE_STATUSES } from "@/lib/constants";
 import { useCreateIssue } from "@/hooks/use-issues";
-import { useUiStore } from "@/lib/stores/ui-store";
+import { issueHref } from "@/lib/issue-links";
 import { Input } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/avatar";
 import type { IssueDTO } from "@/lib/types";
 
-export function SubtasksList({ issue }: { issue: IssueDTO }) {
+export function SubtasksList({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: string }) {
   const [adding, setAdding] = useState(false);
   const [title, setTitle] = useState("");
   const createIssue = useCreateIssue(issue.projectId);
-  const openIssue = useUiStore((s) => s.openIssue);
 
   async function submit() {
     if (!title.trim()) return;
@@ -32,9 +32,9 @@ export function SubtasksList({ issue }: { issue: IssueDTO }) {
         const StatusIcon = STATUS_ICON[sub.status];
         const meta = findMeta(ISSUE_STATUSES, sub.status);
         return (
-          <button
+          <Link
             key={sub.id}
-            onClick={() => openIssue(`${issue.project.key}-${sub.number}`)}
+            href={issueHref(workspaceSlug, `${issue.project.key}-${sub.number}`)}
             className="flex items-center gap-2 rounded-[var(--radius-sm)] px-1.5 py-1.5 text-left text-[13px] hover:bg-surface-2 transition-colors"
           >
             <StatusIcon className="size-3.5 shrink-0" style={{ color: meta.color }} />
@@ -43,7 +43,7 @@ export function SubtasksList({ issue }: { issue: IssueDTO }) {
             </span>
             <span className="min-w-0 flex-1 truncate text-text-primary">{sub.title}</span>
             {sub.assignee && <Avatar name={sub.assignee.name} src={sub.assignee.avatarUrl} size="xs" />}
-          </button>
+          </Link>
         );
       })}
 

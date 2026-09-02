@@ -8,6 +8,7 @@ export const createIssueSchema = z.object({
   projectId: z.string().min(1),
   title: z.string().trim().min(1, "Title is required").max(240),
   description: z.string().trim().max(20000).optional(),
+  acceptanceCriteria: z.string().trim().max(20000).optional(),
   type: issueTypeEnum.optional(),
   status: issueStatusEnum.optional(),
   priority: issuePriorityEnum.optional(),
@@ -24,6 +25,7 @@ export type CreateIssueInput = z.infer<typeof createIssueSchema>;
 export const updateIssueSchema = z.object({
   title: z.string().trim().min(1).max(240).optional(),
   description: z.string().trim().max(20000).optional().nullable(),
+  acceptanceCriteria: z.string().trim().max(20000).optional().nullable(),
   type: issueTypeEnum.optional(),
   status: issueStatusEnum.optional(),
   priority: issuePriorityEnum.optional(),

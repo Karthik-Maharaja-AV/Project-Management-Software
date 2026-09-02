@@ -11,5 +11,5 @@ export default async function MyWorkPage({
   const session = await auth();
   const { workspace } = await getWorkspaceDetail(session!.user.id, workspaceSlug);
 
-  return <MyWorkView workspaceId={workspace.id} />;
+  return <MyWorkView workspaceId={workspace.id} workspaceSlug={workspaceSlug} />;
 }

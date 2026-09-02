@@ -11,7 +11,6 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { CommandPalette } from "@/components/search/command-palette";
 import { CreateProjectDialog } from "@/components/projects/create-project-dialog";
 import { CreateIssueModal } from "@/components/issues/create-issue-modal";
-import { IssueDetailDrawer } from "@/components/issues/issue-detail-drawer";
 import { useUiStore } from "@/lib/stores/ui-store";
 import { cn } from "@/lib/utils";
 
@@ -126,7 +125,6 @@ export function AppShell({
 
       <CommandPalette workspaceId={workspace.id} workspaceSlug={workspace.slug} projects={projects} />
       <CreateIssueModal projects={projects} />
-      <IssueDetailDrawer workspaceSlug={workspace.slug} />
       <CreateProjectDialog
         workspaceId={workspace.id}
         workspaceSlug={workspace.slug}

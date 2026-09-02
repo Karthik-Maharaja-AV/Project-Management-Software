@@ -1,22 +1,30 @@
 "use client";
 
+import Link from "next/link";
 import { TYPE_ICON, PRIORITY_ICON, findMeta, ISSUE_TYPES, ISSUE_PRIORITIES } from "@/lib/constants";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useUiStore } from "@/lib/stores/ui-store";
+import { issueHref } from "@/lib/issue-links";
 import type { IssueDTO } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function IssueCard({ issue, className }: { issue: IssueDTO; className?: string }) {
-  const openIssue = useUiStore((s) => s.openIssue);
+export function IssueCard({
+  issue,
+  workspaceSlug,
+  className,
+}: {
+  issue: IssueDTO;
+  workspaceSlug: string;
+  className?: string;
+}) {
   const TypeIcon = TYPE_ICON[issue.type];
   const PriorityIcon = PRIORITY_ICON[issue.priority];
   const priorityMeta = findMeta(ISSUE_PRIORITIES, issue.priority);
   const typeMeta = findMeta(ISSUE_TYPES, issue.type);
 
   return (
-    <button
-      onClick={() => openIssue(issue.key)}
+    <Link
+      href={issueHref(workspaceSlug, issue.key)}
       className={cn(
         "flex w-full flex-col gap-2 rounded-[var(--radius-md)] border border-border bg-surface-1 p-2.5 text-left shadow-[var(--shadow-sm)] transition-all hover:border-border-strong hover:shadow-[var(--shadow-md)]",
         className,
@@ -59,6 +67,6 @@ export function IssueCard({ issue, className }: { issue: IssueDTO; className?: s
           <span className="size-5 rounded-full border border-dashed border-border-strong" />
         )}
       </div>
-    </button>
+    </Link>
   );
 }

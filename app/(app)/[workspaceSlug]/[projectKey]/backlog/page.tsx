@@ -11,5 +11,5 @@ export default async function BacklogPage({
   const session = await auth();
   const { project } = await getProjectByKey(session!.user.id, workspaceSlug, projectKey);
 
-  return <BacklogView projectId={project.id} />;
+  return <BacklogView projectId={project.id} workspaceSlug={workspaceSlug} />;
 }

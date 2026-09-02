@@ -21,7 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { IssueDTO } from "@/lib/types";
 import type { IssueStatus } from "@prisma/client";
 
-export function KanbanBoard({ projectId }: { projectId: string }) {
+export function KanbanBoard({ projectId, workspaceSlug }: { projectId: string; workspaceSlug: string }) {
   const { data: issues, isLoading } = useProjectIssues(projectId);
   const moveIssue = useMoveIssue(projectId);
   const [filters, setFilters] = useState<BoardFilterState>(EMPTY_FILTERS);
@@ -123,10 +123,18 @@ export function KanbanBoard({ projectId }: { projectId: string }) {
         >
           <div className="flex h-full gap-4 p-4">
             {BOARD_STATUSES.map((status) => (
-              <BoardColumn key={status} status={status} issues={columns[status]} projectId={projectId} />
+              <BoardColumn
+                key={status}
+                status={status}
+                issues={columns[status]}
+                projectId={projectId}
+                workspaceSlug={workspaceSlug}
+              />
             ))}
           </div>
-          <DragOverlay>{activeIssue && <IssueCard issue={activeIssue} className="w-72 rotate-2" />}</DragOverlay>
+          <DragOverlay>
+            {activeIssue && <IssueCard issue={activeIssue} workspaceSlug={workspaceSlug} className="w-72 rotate-2" />}
+          </DragOverlay>
         </DndContext>
       </div>
     </div>

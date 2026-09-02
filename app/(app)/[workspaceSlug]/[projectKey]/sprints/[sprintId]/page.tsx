@@ -11,5 +11,5 @@ export default async function SprintPage({
   const session = await auth();
   const { project } = await getProjectByKey(session!.user.id, workspaceSlug, projectKey);
 
-  return <SprintDetail projectId={project.id} sprintId={sprintId} />;
+  return <SprintDetail projectId={project.id} sprintId={sprintId} workspaceSlug={workspaceSlug} />;
 }

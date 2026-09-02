@@ -30,6 +30,7 @@ export function SprintSection({
   sprint,
   issues,
   projectId,
+  workspaceSlug,
   selectedIds,
   onToggleSelect,
   onIssueSprintChange,
@@ -38,6 +39,7 @@ export function SprintSection({
   sprint: SprintLike;
   issues: IssueDTO[];
   projectId: string;
+  workspaceSlug: string;
   selectedIds: Set<string>;
   onToggleSelect: (id: string, selected: boolean) => void;
   onIssueSprintChange: (issueId: string, sprintId: string | null) => void;
@@ -107,6 +109,7 @@ export function SprintSection({
               <BacklogIssueRow
                 key={issue.id}
                 issue={issue}
+                workspaceSlug={workspaceSlug}
                 selected={selectedIds.has(issue.id)}
                 onSelectChange={(s) => onToggleSelect(issue.id, s)}
                 onSprintChange={(sprintId) => onIssueSprintChange(issue.id, sprintId)}

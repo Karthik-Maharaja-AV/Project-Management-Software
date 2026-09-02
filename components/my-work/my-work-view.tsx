@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useMyWork } from "@/hooks/use-dashboard";
-import { useUiStore } from "@/lib/stores/ui-store";
+import { issueHref } from "@/lib/issue-links";
 import { STATUS_ICON, findMeta, ISSUE_STATUSES } from "@/lib/constants";
 import { RecentActivityList } from "@/components/dashboard/recent-activity-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,25 +19,23 @@ const GROUPS: { key: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE"; label: strin
   { key: "DONE", label: "Completed" },
 ];
 
-function MiniIssueRow({ issue }: { issue: IssueDTO }) {
-  const openIssue = useUiStore((s) => s.openIssue);
+function MiniIssueRow({ issue, workspaceSlug }: { issue: IssueDTO; workspaceSlug: string }) {
   const TypeIcon = STATUS_ICON[issue.status];
   const meta = findMeta(ISSUE_STATUSES, issue.status);
   return (
-    <button
-      onClick={() => openIssue(issue.key)}
+    <Link
+      href={issueHref(workspaceSlug, issue.key)}
       className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-left text-[13px] hover:bg-surface-2"
     >
       <TypeIcon className="size-3.5 shrink-0" style={{ color: meta.color }} />
       <span className="font-mono text-[11px] text-text-tertiary">{issue.key}</span>
       <span className="min-w-0 flex-1 truncate text-text-primary">{issue.title}</span>
-    </button>
+    </Link>
   );
 }
 
-export function MyWorkView({ workspaceId }: { workspaceId: string }) {
+export function MyWorkView({ workspaceId, workspaceSlug }: { workspaceId: string; workspaceSlug: string }) {
   const { data, isLoading } = useMyWork(workspaceId);
-  const openIssue = useUiStore((s) => s.openIssue);
 
   if (isLoading || !data) {
     return (
@@ -70,7 +69,9 @@ export function MyWorkView({ workspaceId }: { workspaceId: string }) {
                   {data.assigned[group.key].length === 0 ? (
                     <p className="px-2 py-2 text-xs text-text-tertiary">Nothing here.</p>
                   ) : (
-                    data.assigned[group.key].map((issue: IssueDTO) => <MiniIssueRow key={issue.id} issue={issue} />)
+                    data.assigned[group.key].map((issue: IssueDTO) => (
+                      <MiniIssueRow key={issue.id} issue={issue} workspaceSlug={workspaceSlug} />
+                    ))
                   )}
                 </CardContent>
               </Card>
@@ -91,9 +92,9 @@ export function MyWorkView({ workspaceId }: { workspaceId: string }) {
               <p className="text-sm text-text-tertiary">Nothing due soon.</p>
             ) : (
               data.upcoming.map((issue: IssueDTO) => (
-                <button
+                <Link
                   key={issue.id}
-                  onClick={() => openIssue(issue.key)}
+                  href={issueHref(workspaceSlug, issue.key)}
                   className="flex w-full items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-left text-[13px] hover:bg-surface-2"
                 >
                   <span className="font-mono text-[11px] text-text-tertiary">{issue.key}</span>
@@ -103,7 +104,7 @@ export function MyWorkView({ workspaceId }: { workspaceId: string }) {
                       {formatDistanceToNow(new Date(issue.dueDate), { addSuffix: true })}
                     </span>
                   )}
-                </button>
+                </Link>
               ))
             )}
           </CardContent>
@@ -119,7 +120,9 @@ export function MyWorkView({ workspaceId }: { workspaceId: string }) {
             {data.recentlyViewed.length === 0 ? (
               <p className="text-sm text-text-tertiary">Nothing viewed yet.</p>
             ) : (
-              data.recentlyViewed.map((issue: IssueDTO) => <MiniIssueRow key={issue.id} issue={issue} />)
+              data.recentlyViewed.map((issue: IssueDTO) => (
+                <MiniIssueRow key={issue.id} issue={issue} workspaceSlug={workspaceSlug} />
+              ))
             )}
           </CardContent>
         </Card>

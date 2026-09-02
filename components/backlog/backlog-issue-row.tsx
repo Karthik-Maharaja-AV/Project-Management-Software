@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { STATUS_ICON, TYPE_ICON, PRIORITY_ICON, findMeta, ISSUE_STATUSES, ISSUE_TYPES, ISSUE_PRIORITIES } from "@/lib/constants";
-import { useUiStore } from "@/lib/stores/ui-store";
+import { issueHref } from "@/lib/issue-links";
 import { SprintPicker } from "@/components/issues/sprint-picker";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -10,16 +11,17 @@ import type { IssueDTO } from "@/lib/types";
 
 export function BacklogIssueRow({
   issue,
+  workspaceSlug,
   selected,
   onSelectChange,
   onSprintChange,
 }: {
   issue: IssueDTO;
+  workspaceSlug: string;
   selected: boolean;
   onSelectChange: (selected: boolean) => void;
   onSprintChange: (sprintId: string | null) => void;
 }) {
-  const openIssue = useUiStore((s) => s.openIssue);
   const StatusIcon = STATUS_ICON[issue.status];
   const TypeIcon = TYPE_ICON[issue.type];
   const PriorityIcon = PRIORITY_ICON[issue.priority];
@@ -32,10 +34,10 @@ export function BacklogIssueRow({
       <Checkbox checked={selected} onCheckedChange={onSelectChange} />
       <StatusIcon className="size-3.5 shrink-0" style={{ color: statusMeta.color }} />
       <TypeIcon className="size-3.5 shrink-0" style={{ color: typeMeta.color }} />
-      <button onClick={() => openIssue(issue.key)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+      <Link href={issueHref(workspaceSlug, issue.key)} className="flex min-w-0 flex-1 items-center gap-2 text-left">
         <span className="font-mono text-[11px] text-text-tertiary">{issue.key}</span>
         <span className="truncate text-[13px] text-text-primary">{issue.title}</span>
-      </button>
+      </Link>
       {issue.epic && (
         <Badge style={{ backgroundColor: `${issue.epic.color}22`, color: issue.epic.color }} className="border-transparent">
           {issue.epic.name}

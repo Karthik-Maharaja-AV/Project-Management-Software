@@ -4,11 +4,6 @@ type UiState = {
   commandPaletteOpen: boolean;
   setCommandPaletteOpen: (open: boolean) => void;
 
-  /** Issue key (e.g. FDJ-12) currently open in the slide-over drawer, or null when closed. */
-  activeIssueKey: string | null;
-  openIssue: (key: string) => void;
-  closeIssue: () => void;
-
   createIssueOpen: boolean;
   createIssueDefaults: { status?: string; sprintId?: string; epicId?: string } | null;
   openCreateIssue: (defaults?: UiState["createIssueDefaults"]) => void;
@@ -22,10 +17,6 @@ type UiState = {
 export const useUiStore = create<UiState>((set) => ({
   commandPaletteOpen: false,
   setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
-
-  activeIssueKey: null,
-  openIssue: (key) => set({ activeIssueKey: key }),
-  closeIssue: () => set({ activeIssueKey: null }),
 
   createIssueOpen: false,
   createIssueDefaults: null,

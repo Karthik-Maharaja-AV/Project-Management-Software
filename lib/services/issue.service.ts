@@ -39,8 +39,8 @@ export const ISSUE_INCLUDE = {
 
 export type IssueWithRelations = Prisma.IssueGetPayload<{ include: typeof ISSUE_INCLUDE }>;
 
-export function issueUrl(workspaceSlug: string, projectKey: string, issueKey: string) {
-  return `/${workspaceSlug}/${projectKey}/board?issue=${issueKey}`;
+export function issueUrl(workspaceSlug: string, issueKey: string) {
+  return `/${workspaceSlug}/issues/${issueKey}`;
 }
 
 function serializeIssue(issue: IssueWithRelations) {
@@ -49,7 +49,7 @@ function serializeIssue(issue: IssueWithRelations) {
     ...issue,
     key,
     labels: issue.labels.map((l) => l.label),
-    url: issueUrl(issue.project.workspace.slug, issue.project.key, key),
+    url: issueUrl(issue.project.workspace.slug, key),
   };
 }
 
@@ -83,6 +83,7 @@ export async function createIssue(userId: string, input: CreateIssueInput) {
       number,
       title: input.title,
       description: input.description,
+      acceptanceCriteria: input.acceptanceCriteria,
       type: input.type ?? "TASK",
       status: input.status ?? "BACKLOG",
       priority: input.priority ?? "NO_PRIORITY",
@@ -206,6 +207,7 @@ export async function updateIssue(userId: string, issueId: string, input: Update
   const data: Prisma.IssueUpdateInput = {};
   if (input.title !== undefined) data.title = input.title;
   if (input.description !== undefined) data.description = input.description;
+  if (input.acceptanceCriteria !== undefined) data.acceptanceCriteria = input.acceptanceCriteria;
   if (input.type !== undefined) data.type = input.type;
   if (input.status !== undefined) data.status = input.status;
   if (input.priority !== undefined) data.priority = input.priority;

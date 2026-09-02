@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { format } from "date-fns";
 import { CheckCircle2, Play } from "lucide-react";
 import { useSprint, useStartSprint, useCompleteSprint } from "@/hooks/use-sprints";
-import { useUiStore } from "@/lib/stores/ui-store";
+import { issueHref } from "@/lib/issue-links";
 import { STATUS_ICON, findMeta, ISSUE_STATUSES } from "@/lib/constants";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -21,11 +22,18 @@ type SprintIssue = {
   assignee: { id: string; name: string; avatarUrl: string | null } | null;
 };
 
-export function SprintDetail({ projectId, sprintId }: { projectId: string; sprintId: string }) {
+export function SprintDetail({
+  projectId,
+  sprintId,
+  workspaceSlug,
+}: {
+  projectId: string;
+  sprintId: string;
+  workspaceSlug: string;
+}) {
   const { data: sprint, isLoading } = useSprint(sprintId);
   const startSprint = useStartSprint(projectId);
   const completeSprint = useCompleteSprint(projectId);
-  const openIssue = useUiStore((s) => s.openIssue);
 
   if (isLoading || !sprint) {
     return (
@@ -123,9 +131,9 @@ export function SprintDetail({ projectId, sprintId }: { projectId: string; sprin
             const StatusIcon = STATUS_ICON[issue.status];
             const meta = findMeta(ISSUE_STATUSES, issue.status);
             return (
-              <button
+              <Link
                 key={issue.id}
-                onClick={() => openIssue(`${sprint.project.key}-${issue.number}`)}
+                href={issueHref(workspaceSlug, `${sprint.project.key}-${issue.number}`)}
                 className="flex w-full items-center gap-2.5 border-b border-border px-3 py-2 text-left last:border-b-0 hover:bg-surface-2"
               >
                 <StatusIcon className="size-3.5 shrink-0" style={{ color: meta.color }} />
@@ -139,7 +147,7 @@ export function SprintDetail({ projectId, sprintId }: { projectId: string; sprin
                   </span>
                 )}
                 {issue.assignee && <Avatar name={issue.assignee.name} src={issue.assignee.avatarUrl} size="xs" />}
-              </button>
+              </Link>
             );
           })
         )}

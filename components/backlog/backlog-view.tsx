@@ -24,7 +24,7 @@ type SprintDTO = {
   endDate: string | null;
 };
 
-export function BacklogView({ projectId }: { projectId: string }) {
+export function BacklogView({ projectId, workspaceSlug }: { projectId: string; workspaceSlug: string }) {
   const { data: issues, isLoading: issuesLoading } = useProjectIssues(projectId);
   const { data: sprints, isLoading: sprintsLoading } = useProjectSprints(projectId);
   const updateIssue = useUpdateIssue(projectId);
@@ -101,6 +101,7 @@ export function BacklogView({ projectId }: { projectId: string }) {
           sprint={sprint}
           issues={(issuesBySprintId.get(sprint.id) ?? []).sort((a, b) => a.boardOrder - b.boardOrder)}
           projectId={projectId}
+          workspaceSlug={workspaceSlug}
           selectedIds={selectedIds}
           onToggleSelect={toggleSelect}
           onIssueSprintChange={changeIssueSprint}
@@ -126,6 +127,7 @@ export function BacklogView({ projectId }: { projectId: string }) {
             <BacklogIssueRow
               key={issue.id}
               issue={issue}
+              workspaceSlug={workspaceSlug}
               selected={selectedIds.has(issue.id)}
               onSelectChange={(s) => toggleSelect(issue.id, s)}
               onSprintChange={(sprintId) => changeIssueSprint(issue.id, sprintId)}

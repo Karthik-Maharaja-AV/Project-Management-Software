@@ -11,5 +11,5 @@ export default async function BoardPage({
   const session = await auth();
   const { project } = await getProjectByKey(session!.user.id, workspaceSlug, projectKey);
 
-  return <KanbanBoard projectId={project.id} />;
+  return <KanbanBoard projectId={project.id} workspaceSlug={workspaceSlug} />;
 }
