@@ -24,7 +24,7 @@ import { AssigneePicker } from "@/components/issues/assignee-picker";
 import { LabelPicker } from "@/components/issues/label-picker";
 import { EpicPicker } from "@/components/issues/epic-picker";
 import { SprintPicker } from "@/components/issues/sprint-picker";
-import { MarkdownEditor } from "@/components/issues/markdown-editor";
+import { RichTextEditor } from "@/components/issues/rich-text-editor";
 import type { ProjectSummary } from "@/components/layout/project-nav";
 import type { IssueType, IssuePriority, IssueStatus } from "@prisma/client";
 
@@ -143,7 +143,7 @@ export function CreateIssueModal({ projects }: { projects: ProjectSummary[] }) {
             />
 
             {projectId && (
-              <MarkdownEditor
+              <RichTextEditor
                 projectId={projectId}
                 value={description}
                 onChange={setDescription}

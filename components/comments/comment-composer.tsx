@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCreateComment } from "@/hooks/use-comments";
-import { MarkdownEditor } from "@/components/issues/markdown-editor";
+import { RichTextEditor } from "@/components/issues/rich-text-editor";
 import { Button } from "@/components/ui/button";
 
 export function CommentComposer({ issueId, projectId }: { issueId: string; projectId: string }) {
@@ -22,7 +22,7 @@ export function CommentComposer({ issueId, projectId }: { issueId: string; proje
 
   return (
     <div className="flex flex-col gap-2">
-      <MarkdownEditor
+      <RichTextEditor
         projectId={projectId}
         value={body}
         onChange={setBody}

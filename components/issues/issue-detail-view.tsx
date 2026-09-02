@@ -18,7 +18,7 @@ import { AssigneePicker } from "@/components/issues/assignee-picker";
 import { LabelPicker } from "@/components/issues/label-picker";
 import { EpicPicker } from "@/components/issues/epic-picker";
 import { SprintPicker } from "@/components/issues/sprint-picker";
-import { MarkdownEditor } from "@/components/issues/markdown-editor";
+import { RichTextEditor } from "@/components/issues/rich-text-editor";
 import { SubtasksList } from "@/components/issues/subtasks-list";
 import { AttachmentsList } from "@/components/issues/attachments-list";
 import { IssueLinks } from "@/components/issues/issue-links";
@@ -147,7 +147,7 @@ function IssueDetailBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceS
 
           <div>
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">Description</h3>
-            <MarkdownEditor
+            <RichTextEditor
               projectId={issue.projectId}
               value={description}
               onChange={setDescription}
@@ -161,7 +161,7 @@ function IssueDetailBody({ issue, workspaceSlug }: { issue: IssueDTO; workspaceS
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-tertiary">
               Acceptance Criteria
             </h3>
-            <MarkdownEditor
+            <RichTextEditor
               projectId={issue.projectId}
               value={acceptanceCriteria}
               onChange={setAcceptanceCriteria}
